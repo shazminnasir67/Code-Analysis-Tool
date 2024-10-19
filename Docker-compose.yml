@@ -1,0 +1,51 @@
+
+#### Explanation:
+- **Project Title & Description**: A brief description of what your project does.
+- **Features**: A list of what the app can do.
+- **Technology Stack**: Overview of technologies used (Python, FastAPI, Docker, etc.).
+- **Getting Started**: Step-by-step guide to get the project running.
+- **Usage**: How users can use the project.
+- **API Endpoints**: Listing the main API routes for static analysis and bug detection.
+- **Contributing**: Guidelines for contributing to the project.
+- **License**: You can link to your project’s license (MIT, GPL, etc.).
+
+---
+
+### **Step 3: Create a `docker-compose.yml` File**
+
+If you're using **Docker Compose**, this file is used to define how the backend (FastAPI) and possibly other services (like a database or frontend server) run together.
+
+
+
+#### **Basic `docker-compose.yml` for FastAPI & LM-Studio Setup**
+
+```yaml
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: fastapi_backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - LM_STUDIO_URL=http://lm-studio-service:1234/v1/chat/completions
+    depends_on:
+      - lm-studio-service
+    networks:
+      - app_network
+
+  lm-studio-service:
+    image: lmstudio/codegemma:latest
+    container_name: lm_studio_service
+    ports:
+      - "1234:1234"
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
